@@ -14,7 +14,6 @@ import (
 	"github.com/zeebo/errs"
 	"go.uber.org/zap"
 
-	"storj.io/common/errs2"
 	minio "storj.io/minio/cmd"
 	"storj.io/minio/pkg/auth"
 	"storj.io/minio/pkg/bucket/policy"
@@ -89,7 +88,10 @@ func minioError(err error) bool {
 func (l *singleTenancyLayer) log(err error) error {
 	// most of the time context canceled is intentionally caused by the client
 	// to keep log message clean, we will only log it on debug level
-	if errs2.IsCanceled(err) {
+	if errs.IsFunc(err, func(err error) bool {
+		return err == context.Canceled || //nolint:errorlint, goerr113
+			rpcstatus.Code(err) == 2
+	}) {
 		l.logger.Debug("error:", zap.Error(err))
 		return err
 	}

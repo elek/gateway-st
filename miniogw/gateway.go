@@ -20,8 +20,7 @@ import (
 	"github.com/spacemonkeygo/monkit/v3"
 	"github.com/zeebo/errs"
 
-	"storj.io/common/memory"
-	"storj.io/common/sync2"
+	"storj.io/gateway/internal/sync2"
 	minio "storj.io/minio/cmd"
 	"storj.io/minio/cmd/config/storageclass"
 	xhttp "storj.io/minio/cmd/http"
@@ -893,7 +892,7 @@ func (layer *gatewayLayer) PutObject(ctx context.Context, bucket, object string,
 		return minio.ObjectInfo{}, minio.BucketNameInvalid{Bucket: bucket}
 	}
 
-	if len(object) > memory.KiB.Int() { // https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+	if len(object) > 1024 { // https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
 		return minio.ObjectInfo{}, minio.ObjectNameTooLong{Bucket: bucket, Object: object}
 	}
 
@@ -974,7 +973,7 @@ func (layer *gatewayLayer) CopyObject(ctx context.Context, srcBucket, srcObject,
 		return minio.ObjectInfo{}, minio.NotImplemented{Message: "CopyObject"}
 	}
 
-	if len(destObject) > memory.KiB.Int() { // https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+	if len(destObject) > 1024 { // https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
 		return minio.ObjectInfo{}, minio.ObjectNameTooLong{Bucket: destBucket, Object: destObject}
 	}
 

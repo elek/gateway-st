@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"os"
@@ -21,8 +22,7 @@ import (
 	"github.com/zeebo/errs"
 	"go.uber.org/zap"
 
-	"storj.io/common/base58"
-	"storj.io/common/fpath"
+	"storj.io/gateway/internal/fpath"
 	"storj.io/gateway/internal/wizard"
 	"storj.io/gateway/miniogw"
 	minio "storj.io/minio/cmd"
@@ -174,7 +174,7 @@ func generateKey() (key string, err error) {
 	if err != nil {
 		return "", Error.Wrap(err)
 	}
-	return base58.Encode(buf[:]), nil
+	return base64.StdEncoding.EncodeToString(buf[:]), nil
 }
 
 func checkCfg(ctx context.Context) (err error) {
